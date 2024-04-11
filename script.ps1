@@ -22,6 +22,7 @@ if ($genqr -eq $true) {
         $genqr = $false
         }
     }
+    }
 
 foreach ($vpnuser in $vpnusers) {
 $CurrentAttributeValue = (Get-ADUser -Identity $vpnuser -Properties *).$AttributeName
