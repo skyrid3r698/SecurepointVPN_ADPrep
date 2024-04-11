@@ -13,7 +13,13 @@ if ($genqr -eq $true) {
         }
     else {
         Write-Host "QRCodeGenerator module is not installed! Please follow the install"
-        Install-Module QR-CodeGenerator
+        Install-Module QRCodeGenerator
+        Import-Module QRCodeGenerator
+        if ((get-module qrcodegenerator) -ne $null) {
+        }
+        else {
+        Write-Host "QRCodeGenerator install failed! QR-Codes will not be generated"
+        $genqr = $false
         }
     }
 
