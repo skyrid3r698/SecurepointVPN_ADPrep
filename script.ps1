@@ -42,5 +42,5 @@ if ($CurrentAttributeValue -ne $null) {
     }
 }
 if ($genqr -eq $true) {
-    explorer.exe "C:\Users\$env:username\Desktop\QR-Codes\$($vpnuser.name).png"
+    explorer.exe "C:\Users\$env:username\Desktop\QR-Codes\"
     }
