@@ -8,6 +8,7 @@ $issuer = "MCOMP_VPN"
 $vpnusers = Get-ADGroupMember -Identity $GroupName
 
 if ($genqr -eq $true) {
+    mkdir C:\Users\$env:username\Desktop\QR-Codes\
     if ((get-module qrcodegenerator) -ne $null) {
         }
     else {
@@ -21,7 +22,6 @@ $CurrentAttributeValue = (Get-ADUser -Identity $vpnuser -Properties *).$Attribut
 if ($CurrentAttributeValue -ne $null) {
     Write-Host $vpnuser.name "has value: $CurrentAttributeValue Will be skipped." -ForegroundColor Yellow
     if ($genqr -eq $true) {
-        mkdir C:\Users\$env:username\Desktop\QR-Codes\
         New-QRCodeText -Text "otpauth://totp/$($vpnuser.name)?secret=$CurrentAttributeValue&issuer=$issuer&algorithm=SHA1&digits=6&period=30" -OutPath "C:\Users\$env:username\Desktop\QR-Codes\$($vpnuser.name).png"
         }
     }
@@ -32,11 +32,10 @@ if ($CurrentAttributeValue -ne $null) {
     Set-ADUser -Identity $vpnuser -Add @{ extensionAttribute10 = $userkey }
     Write-Host "$($vpnuser.name) Now has value: $userkey" -ForegroundColor Green
     if ($genqr -eq $true) {
-        mkdir C:\Users\$env:username\Desktop\QR-Codes\
         New-QRCodeText -Text "otpauth://totp/$($vpnuser.name)?secret=$userkey&issuer=$issuer&algorithm=SHA1&digits=6&period=30" -OutPath "C:\Users\$env:username\Desktop\QR-Codes\$($vpnuser.name).png"
         }
     }
+}
 if ($genqr -eq $true) {
     explorer.exe "C:\Users\$env:username\Desktop\QR-Codes\$($vpnuser.name).png"
     }
-}
