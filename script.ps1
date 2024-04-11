@@ -8,20 +8,18 @@ $issuer = "MCOMP_VPN"
 $vpnusers = Get-ADGroupMember -Identity $GroupName
 
 if ($genqr -eq $true) {
-    mkdir C:\Users\$env:username\Desktop\QR-Codes\
-    if ((get-module qrcodegenerator) -ne $null) {
+    if ((test-path "C:\Users\$env:username\Desktop\QR-Codes\") -eq $false) {
+        mkdir "C:\Users\$env:username\Desktop\QR-Codes\"
         }
-    else {
-        Write-Host "QRCodeGenerator module is not installed! Please follow the install"
+    if ((get-module qrcodegenerator) -eq $null) {
+         Write-Host "QRCodeGenerator module is not installed! Please follow the install"
         Install-Module QRCodeGenerator
         Import-Module QRCodeGenerator
-        if ((get-module qrcodegenerator) -ne $null) {
+        if ((get-module qrcodegenerator) -eq $null) {
+            Write-Host "QRCodeGenerator install failed! QR-Codes will not be generated"
+            $genqr = $false
+            }
         }
-        else {
-        Write-Host "QRCodeGenerator install failed! QR-Codes will not be generated"
-        $genqr = $false
-        }
-    }
     }
 
 foreach ($vpnuser in $vpnusers) {
