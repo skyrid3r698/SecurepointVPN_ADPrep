@@ -5,6 +5,7 @@ Param(
 
 $AttributeSecret = "extensionAttribute10"
 $AttributeCrt = "extensionAttribute12"
+$SPIP = ((Get-NetIpConfiguration).IPv4DefaultGateway).NextHop
 $SPName = 
 $SPPass = 
 $GroupName = "GRP_SecurePoint-VPN"
