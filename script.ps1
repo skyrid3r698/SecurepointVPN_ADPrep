@@ -19,6 +19,9 @@ $vpnusers = Get-ADGroupMember -Identity $GroupName
 #defining variables
 $global:totalcount > $null
 $global:CACleanOutput > $null
+$global:SshSession > $null
+$global:Cert > $null
+
 
 if ($genqr -eq $true) {
     if ((test-path "C:\Users\$env:username\Desktop\QR-Codes\") -eq $false) {
@@ -47,18 +50,18 @@ if((Get-Module -Name "Posh-SSH" -ListAvailable) -eq $null) {
             }
 }
 
-$SshSession = New-SSHSession -ComputerName $SPIP -Credential $global:SpCred -AcceptKey -ErrorAction Stop
+$global:SshSession = New-SSHSession -ComputerName $SPIP -Credential $global:SpCred -AcceptKey -ErrorAction Stop
 
 function New-CA {
     $NewCAName = Read-Host "Type the Name of your new CA"
     $NewCAValidity = Read-Host "Type the time the new CA will be valid for in years(default=10)"
     if ($NewCAValidity -eq "") { $NewCAValidity = "10"}
     $NewCAValidity = (Get-Date).AddYears($NewCAValidity).ToString('yyyy-MM-dd-00-00-00')
-    $CAs = Invoke-SSHCommand -SSHSession $SshSession -Command "cert new name $NewCAName common_name $NewCAName bits 4096 valid_since $(Get-Date -Format yyyy-MM-dd-00-00-00) valid_till $NewCAValidity"
+    $CAs = Invoke-SSHCommand -SSHSession $global:SshSession -Command "cert new name $NewCAName common_name $NewCAName bits 4096 valid_since $(Get-Date -Format yyyy-MM-dd-00-00-00) valid_till $NewCAValidity"
 }
 
 function Get-CA ([switch]$silent){
-$CAID = Invoke-SSHCommand -SSHSession $SshSession -Command "cert get"
+$CAID = Invoke-SSHCommand -SSHSession $global:SshSession -Command "cert get"
 $CAID = ($CAID | findstr "KEY,CA").Replace(" ", "").Replace("-","").Replace("+","").Replace(",","")
 $global:totalcount = $($CAID.count)
 $count = -1
@@ -84,7 +87,7 @@ function New-UserCert([string]$NewCertName) {
     $NewCertValidity = Read-Host "Type the time the new Certs will be valid for in years(default=5)"
     if ($NewCertValidity -eq "") { $NewCertValidity = "5"}
     $NewCertValidity = (Get-Date).AddYears($NewCertValidity).ToString('yyyy-MM-dd-00-00-00')
-    $Cert = Invoke-SSHCommand -SSHSession $SshSession -Command "cert new name $NewCertName-RW common_name $NewCertName-RW bits 4096 valid_since $(Get-Date -Format yyyy-MM-dd-00-00-00) valid_till $NewCertValidity issuer_id $CACleanSelection flags KEY signature_algo sha256WithRSAEncryption"
+    $global:Cert = Invoke-SSHCommand -SSHSession $global:SshSession -Command "cert new name $NewCertName-RW bits 4096 valid_since $(Get-Date -Format yyyy-MM-dd-00-00-00) valid_till $NewCertValidity issuer_id $CACleanSelection flags KEY signature_algo sha256WithRSAEncryption"
 }
 
 Write-Host "The following $global:totalcount CAs were found on your Firewall:"
@@ -103,7 +106,6 @@ else {
 }
 $CACleanSelection = (($global:CACleanOutput[$CASelection]) -split '\|')[0]
 
-Remove-SSHSession -SSHSession $SshSession > $null
 }
 
 foreach ($vpnuser in $vpnusers) {
@@ -115,6 +117,7 @@ if ($CurrentAttributeValue -ne $null) {
         }
     if ($gencrt -eq $true) {
         New-UserCert -NewCertName "$vpnuser"
+        Set-ADUser -Identity $vpnuser -Add @{ $AttributeCert = "$vpnuser-RW" }
         }
     }
     else {
@@ -128,9 +131,12 @@ if ($CurrentAttributeValue -ne $null) {
         }
     if ($gencrt -eq $true) {
         New-UserCert -NewCertName "$vpnuser"
+        Set-ADUser -Identity $vpnuser -Add @{ $AttributeCert = "$vpnuser-RW" }
         }
     }
 }
 if ($genqr -eq $true) {
     explorer.exe "C:\Users\$env:username\Desktop\QR-Codes\"
     }
+
+Remove-SSHSession -SSHSession $SshSession > $null
