@@ -117,7 +117,7 @@ if ($CurrentAttributeValue -ne $null) {
         }
     if ($gencrt -eq $true) {
         New-UserCert -NewCertName "$vpnuser"
-        Set-ADUser -Identity $vpnuser -Add @{ $AttributeCert = "$vpnuser-RW" }
+        Set-ADUser -Identity $vpnuser -Add @{ $AttributeCrt = "$vpnuser-RW" }
         }
     }
     else {
@@ -131,7 +131,7 @@ if ($CurrentAttributeValue -ne $null) {
         }
     if ($gencrt -eq $true) {
         New-UserCert -NewCertName "$vpnuser"
-        Set-ADUser -Identity $vpnuser -Add @{ $AttributeCert = "$vpnuser-RW" }
+        Set-ADUser -Identity $vpnuser -Add @{ $AttributeCrt = "$vpnuser-RW" }
         }
     }
 }
