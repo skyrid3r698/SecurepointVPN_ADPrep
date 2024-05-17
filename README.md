@@ -10,3 +10,6 @@ This Script is intendet to be run on the domaincontroller
 # Parameters
 ## -genqr
 QR-Codes are only being generated if this parameter is set. To generate QR-Codes the Powershell module QRCodeGenerator is being used. https://www.powershellgallery.com/packages/QRCodeGenerator
+
+## -gencrt
+Certificates are only being generated if this parameter is set. If this option is used the correct Login Credentials have to be set in the .ps1 script
