@@ -114,7 +114,7 @@ if ($CurrentAttributeValue -ne $null) {
         New-QRCodeText -Text "otpauth://totp/$($vpnuser.name)?secret=$CurrentAttributeValue&issuer=$issuer&algorithm=SHA1&digits=6&period=30" -OutPath "C:\Users\$env:username\Desktop\QR-Codes\$($vpnuser.name).png"
         }
     if ($gencrt -eq $true) {
-        New-UserCert -NewCertName "jnowak"
+        New-UserCert -NewCertName "$vpnuser"
         }
     }
     else {
@@ -127,7 +127,7 @@ if ($CurrentAttributeValue -ne $null) {
         New-QRCodeText -Text "otpauth://totp/$($vpnuser.name)?secret=$userkey&issuer=$issuer&algorithm=SHA1&digits=6&period=30" -OutPath "C:\Users\$env:username\Desktop\QR-Codes\$($vpnuser.name).png"
         }
     if ($gencrt -eq $true) {
-        New-UserCert -NewCertName "jnowak"
+        New-UserCert -NewCertName "$vpnuser"
         }
     }
 }
